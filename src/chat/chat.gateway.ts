@@ -5,13 +5,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer() server;
   users: number = 0;
+  ListUser = []
 
   async handleConnection() {
 
     // A client has connected
     this.users++;
-    console.log('usuario conectado, total: ', this.users)
-
     // Notify connected clients of current users
     this.server.emit('users', this.users);
 
@@ -23,15 +22,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.users--;
 
     // Notify connected clients of current users
-    console.log('usuario Desconectado, total: ', this.users)
-
-    this.server.emit('users', this.users);
+    if (this.server.nickname) {
+      this.ListUser.splice( this.ListUser.indexOf(this.server.nickname) );
+    }
+    this.server.emit('List Users', this.ListUser);
+    // this.server.emit('users', this.users);
 
   }
 
   @SubscribeMessage('chat')
   async onChat(client, message) {
+    console.log(message)
     client.broadcast.emit('chat', message);
+  }
+
+  @SubscribeMessage('new user')
+  async onNewUser(client, user) {
+    this.server.nickname = user;
+    this.ListUser.push(this.server.nickname);
+    this.server.emit('List Users', this.ListUser);
   }
 
 }
