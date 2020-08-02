@@ -1,0 +1,21 @@
+version: '3'
+
+services: 
+    mongo:
+        image: mongo
+        container_name: mongo-service
+        ports: 
+            - 27017:27017
+        expose: 
+            - 27017
+    
+    back:
+        container_name: "chat-service"
+        restart: always
+        build: .
+        ports: 
+            - 3000:3000
+        depends_on: 
+            - mongo
+        volumes: 
+            - .:/usr/src/app
