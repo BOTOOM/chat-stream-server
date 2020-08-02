@@ -19,3 +19,5 @@ services:
             - mongo
         volumes: 
             - .:/usr/src/app
+        links: 
+            - mongo
